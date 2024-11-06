@@ -36,7 +36,7 @@
               <attach>false</attach>
               <transformers>
                 <transformer>
-                  <mainClass>com.example.s3.FileUploadHandler</mainClass>
+                  <mainClass>com.example.s3.handler.GeneratePresignedUrlHandler</mainClass>
                 </transformer>
               </transformers>
             </configuration>

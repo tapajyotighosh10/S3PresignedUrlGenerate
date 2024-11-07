@@ -19,7 +19,7 @@ public class S3Config {
     public String createPresignedUrl(String bucketName, String filename, Map<String, String> metadata) {
         try (S3Presigner presigner = S3Presigner.builder()
                 .region(Region.US_EAST_1)
-                .credentialsProvider(EnvironmentVariableCredentialsProvider.create()) // Custom credentials provider
+                .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
                 .build()) {
 
             PutObjectRequest objectRequest = PutObjectRequest.builder()
@@ -27,7 +27,6 @@ public class S3Config {
                     .key(filename)
                     .metadata(metadata)
                     .build();
-
 
             PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
                     .signatureDuration(Duration.ofMinutes(60))

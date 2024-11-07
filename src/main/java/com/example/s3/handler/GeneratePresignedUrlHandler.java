@@ -19,9 +19,19 @@ public class GeneratePresignedUrlHandler implements RequestHandler<APIGatewayPro
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent request, Context context) {
         ObjectMapper objectMapper = new ObjectMapper();
         FileRequest fileRequest = null;
+
+        context.getLogger().log("Request Body: " + request.getBody());
+        if (request.getBody() == null) {
+            context.getLogger().log("Request Body is null");
+            return new APIGatewayProxyResponseEvent()
+                    .withStatusCode(400)
+                    .withBody("{\"error\": \"Request body is missing.\"}");
+        }
+
         try {
             fileRequest = objectMapper.readValue(request.getBody(), FileRequest.class);
         } catch (Exception e) {
+            context.getLogger().log("Error parsing request body: " + e.getMessage());
             return new APIGatewayProxyResponseEvent()
                     .withStatusCode(400)
                     .withBody("{\"error\": \"Invalid input. Filename is required.\"}");
@@ -34,18 +44,17 @@ public class GeneratePresignedUrlHandler implements RequestHandler<APIGatewayPro
         }
 
         String bucketName = System.getenv("BUCKET_NAME");
+        context.getLogger().log("Bucket Name: " + bucketName);
         if (bucketName == null || bucketName.isEmpty()) {
             return new APIGatewayProxyResponseEvent()
                     .withStatusCode(500)
                     .withBody("{\"error\": \"Bucket name is not set in the environment variable.\"}");
         }
 
-
         Map<String, String> metadata = new HashMap<>();
         metadata.put("custom-metadata", "example");
 
         String presignedUrl = s3Config.createPresignedUrl(bucketName, fileRequest.getFilename(), metadata);
-
         if (presignedUrl == null) {
             return new APIGatewayProxyResponseEvent()
                     .withStatusCode(500)
@@ -54,6 +63,9 @@ public class GeneratePresignedUrlHandler implements RequestHandler<APIGatewayPro
 
         return new APIGatewayProxyResponseEvent()
                 .withStatusCode(200)
+                .withHeaders(Map.of("Content-Type", "application/json"))
                 .withBody("{\"upload_url\": \"" + presignedUrl + "\"}");
+
     }
+
 }

@@ -33,7 +33,6 @@
             </goals>
             <configuration>
               <finalName>lambda-s3-presigned-url</finalName>
-              <attach>false</attach>
               <transformers>
                 <transformer>
                   <mainClass>com.example.s3.handler.GeneratePresignedUrlHandler</mainClass>
